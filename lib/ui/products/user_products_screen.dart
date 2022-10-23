@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myshop/models/product.dart';
+import 'package:myshop/ui/screens.dart';
 
 import 'package:provider/provider.dart';
 
@@ -19,7 +20,7 @@ class UserProductsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Your Products'),
         actions: <Widget>[
-          buildAddButton(),
+          buildAddButton(context),
         ],
       ),
       drawer: const AppDrawer(),
@@ -48,11 +49,14 @@ class UserProductsScreen extends StatelessWidget {
     );
   }
 
-  Widget buildAddButton() {
+  Widget buildAddButton(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.add),
       onPressed: () {
-        print('Go to edit product screen');
+        print(EditProductScreen.routeName);
+        Navigator.of(context).pushNamed(
+          EditProductScreen.routeName,
+        );
       },
     );
   }
