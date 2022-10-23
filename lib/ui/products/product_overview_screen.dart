@@ -8,6 +8,8 @@ import '../shared/app_drawer.dart';
 import '../cart/cart_manager.dart';
 import 'top_right_badge.dart';
 
+import 'package:provider/provider.dart';
+
 enum FilterOptions { favorite, all }
 
 class ProductsOverviewScreen extends StatefulWidget {
@@ -36,19 +38,20 @@ class _ProductsOverViewScreenState extends State<ProductsOverviewScreen> {
   }
 
   Widget buildShoppingCarIcon() {
-    return TopRightBadge(
-      data: CartManager().productCount,
-      child: IconButton(
-        icon: const Icon(
-        Icons.shopping_cart,
-      ),
-
-        onPressed: () {
-          Navigator.of(context).pushNamed(CartScreen.routeName);
-        },
-      ),
-      
-      
+    return Consumer<CartManager>(
+      builder: (ctx, cartManager, child) {
+        return TopRightBadge(
+          data: CartManager().productCount,
+          child: IconButton(
+            icon: const Icon(
+              Icons.shopping_cart,
+            ),
+            onPressed: () {
+              Navigator.of(context).pushNamed(CartScreen.routeName);
+            },
+          ),
+        );
+      },
     );
   }
 
