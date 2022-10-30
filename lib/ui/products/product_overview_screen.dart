@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myshop/ui/cart/cart_sreen.dart';
 import 'package:myshop/ui/products/products_grid.dart';
+import 'package:myshop/ui/products/products_manager.dart';
 
 import '../shared/app_drawer.dart';
 //import 'product_grid_tile.dart';
@@ -20,21 +21,42 @@ class ProductsOverviewScreen extends StatefulWidget {
 }
 
 class _ProductsOverViewScreenState extends State<ProductsOverviewScreen> {
-  var _showOnlyFavorites = false;
+  final _showOnlyFavorites = ValueNotifier<bool>(false);
+  late Future<void> _fetchProducts;
+  // var _showOnlyFavorites = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProducts = context.read<ProductsManager>().fetchProducts();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('MyShop'),
-        actions: <Widget>[
-          buildProductFilterMenu(),
-          buildShoppingCarIcon(),
-        ],
-      ),
-      drawer: const AppDrawer(),
-      body: ProductsGrid(_showOnlyFavorites),
-    );
+        appBar: AppBar(
+          title: const Text('MyShop'),
+          actions: <Widget>[
+            buildProductFilterMenu(),
+            buildShoppingCarIcon(),
+          ],
+        ),
+        drawer: const AppDrawer(),
+        body: FutureBuilder(
+          future: _fetchProducts,
+          builder: ((context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return ValueListenableBuilder<bool>(
+                  valueListenable: _showOnlyFavorites,
+                  builder: (context, onlyFavorites, child) {
+                    return ProductsGrid(onlyFavorites);
+                  });
+            }
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }),
+        ));
   }
 
   Widget buildShoppingCarIcon() {
@@ -60,9 +82,9 @@ class _ProductsOverViewScreenState extends State<ProductsOverviewScreen> {
       onSelected: (FilterOptions selectedValue) {
         setState(() {
           if (selectedValue == FilterOptions.favorite) {
-            _showOnlyFavorites = true;
+            _showOnlyFavorites.value = true;
           } else {
-            _showOnlyFavorites = false;
+            _showOnlyFavorites.value = false;
           }
         });
       },
